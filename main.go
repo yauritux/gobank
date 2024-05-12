@@ -2,16 +2,25 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 )
 
 func main() {
 	fmt.Println("Starting Accounts service at port 8080...")
 
-	accountService := NewService()
+	db, err := NewPostgres()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	fmt.Printf("%+v\n", db)
+
+	accountService := NewService(db)
 	accountsHandler := NewAPIServer(accountService)
 
-	err := http.ListenAndServe(":8080", initializeRoutes(accountsHandler))
+	err = http.ListenAndServe(":8080", initializeRoutes(accountsHandler))
 	if err != nil {
 		panic(err)
 	}

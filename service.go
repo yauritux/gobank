@@ -23,11 +23,13 @@ type Account struct {
 type Service struct {
 	sync.Mutex
 	accounts map[AccountID]Account
+	db       *PostgresRepository
 }
 
-func NewService() *Service {
+func NewService(db *PostgresRepository) *Service {
 	return &Service{
 		accounts: make(map[AccountID]Account),
+		db:       db,
 	}
 }
 
