@@ -6,11 +6,11 @@ import (
 )
 
 type AccountService interface {
-	Create(account Account) Account
-	ReadAll() []Account
-	Read(id AccountID) (Account, bool)
-	Update(id AccountID, account Account) (Account, bool)
-	Delete(id AccountID) bool
+	Create(account Account) (Account, error)
+	ReadAll() ([]Account, error)
+	Read(id AccountID) (Account, error)
+	Update(id AccountID, account Account) (Account, error)
+	Delete(id AccountID) error
 }
 
 type AccountError struct {
@@ -48,7 +48,11 @@ func (s *APIServer) handleCreateAccounts(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	newAccount := s.accountService.Create(account)
+	newAccount, err := s.accountService.Create(account)
+	if err != nil {
+		s.errorResponse(w, http.StatusExpectationFailed, err.Error())
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
@@ -60,10 +64,15 @@ func (s *APIServer) handleCreateAccounts(w http.ResponseWriter, r *http.Request)
 }
 
 func (s *APIServer) handleGetAccounts(w http.ResponseWriter, r *http.Request) {
-	accounts := s.accountService.ReadAll()
+	accounts, err := s.accountService.ReadAll()
+
+	if err != nil {
+		s.errorResponse(w, http.StatusNotFound, err.Error())
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(accounts)
+	err = json.NewEncoder(w).Encode(accounts)
 	if err != nil {
 		s.errorResponse(w, http.StatusInternalServerError, err.Error())
 		return
@@ -72,14 +81,14 @@ func (s *APIServer) handleGetAccounts(w http.ResponseWriter, r *http.Request) {
 
 func (s *APIServer) handleGetAccountById(w http.ResponseWriter, r *http.Request) {
 	id := AccountID(r.PathValue("id"))
-	account, found := s.accountService.Read(id)
-	if !found {
+	account, err := s.accountService.Read(id)
+	if err != nil {
 		s.errorResponse(w, http.StatusNotFound, "Not Found")
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(account)
+	err = json.NewEncoder(w).Encode(account)
 	if err != nil {
 		s.errorResponse(w, http.StatusInternalServerError, err.Error())
 		return
@@ -96,8 +105,8 @@ func (s *APIServer) handleUpdateAccount(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	account, found := s.accountService.Update(id, updatedAccount)
-	if !found {
+	account, err := s.accountService.Update(id, updatedAccount)
+	if err != nil {
 		s.errorResponse(w, http.StatusNotFound, "Not Found")
 		return
 	}
@@ -112,9 +121,9 @@ func (s *APIServer) handleUpdateAccount(w http.ResponseWriter, r *http.Request) 
 
 func (s *APIServer) handleDeleteAccounts(w http.ResponseWriter, r *http.Request) {
 	id := AccountID(r.PathValue("id"))
-	ok := s.accountService.Delete(id)
-	if !ok {
-		s.errorResponse(w, http.StatusNotFound, "Not Found")
+	err := s.accountService.Delete(id)
+	if err != nil {
+		s.errorResponse(w, http.StatusNotFound, err.Error())
 		return
 	}
 

@@ -22,67 +22,64 @@ type Account struct {
 
 type Service struct {
 	sync.Mutex
-	accounts map[AccountID]Account
-	db       *PostgresRepository
+	db *PostgresRepository
 }
 
 func NewService(db *PostgresRepository) *Service {
 	return &Service{
-		accounts: make(map[AccountID]Account),
-		db:       db,
+		db: db,
 	}
 }
 
-func (s *Service) Create(account Account) Account {
+func (s *Service) Create(account Account) (Account, error) {
 	s.Lock()
 	defer s.Unlock()
 
 	id := NewAccountID()
 	account.ID = string(id)
-	s.accounts[id] = account
-	return account
-}
-
-func (s *Service) ReadAll() []Account {
-	s.Lock()
-	defer s.Unlock()
-
-	accounts := make([]Account, 0, len(s.accounts))
-	for _, account := range s.accounts {
-		accounts = append(accounts, account)
+	if err := s.db.CreateNewAccount(&account); err != nil {
+		return account, err
 	}
-	return accounts
+	return account, nil
 }
 
-func (s *Service) Read(id AccountID) (Account, bool) {
+func (s *Service) ReadAll() ([]Account, error) {
 	s.Lock()
 	defer s.Unlock()
 
-	account, ok := s.accounts[id]
-	return account, ok
-}
-
-func (s *Service) Update(id AccountID, account Account) (Account, bool) {
-	s.Lock()
-	defer s.Unlock()
-
-	_, ok := s.accounts[id]
-	if !ok {
-		return Account{}, false
+	accounts, err := s.db.GetAllAccounts()
+	if err != nil {
+		return nil, err
 	}
+	return accounts, nil
+}
+
+func (s *Service) Read(id AccountID) (Account, error) {
+	s.Lock()
+	defer s.Unlock()
+
+	return s.db.GetAccountById(id)
+}
+
+func (s *Service) Update(id AccountID, account Account) (Account, error) {
+	s.Lock()
+	defer s.Unlock()
+
 	account.ID = string(id)
-	s.accounts[id] = account
-	return account, true
+	err := s.db.UpdateAccount(&account)
+	if err != nil {
+		return account, err
+	}
+
+	return account, nil
 }
 
-func (s *Service) Delete(id AccountID) bool {
+func (s *Service) Delete(id AccountID) error {
 	s.Lock()
 	defer s.Unlock()
 
-	_, ok := s.accounts[id]
-	if !ok {
-		return false
+	if err := s.db.DeleteAccountById(id); err != nil {
+		return err
 	}
-	delete(s.accounts, id)
-	return true
+	return nil
 }
