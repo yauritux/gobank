@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"sync"
 
 	"github.com/google/uuid"
+	"github.com/xuri/excelize/v2"
 )
 
 type AccountID string
@@ -82,4 +85,30 @@ func (s *Service) Delete(id AccountID) error {
 		return err
 	}
 	return nil
+}
+
+func WriteAccountsToExcel(accounts []Account) (*excelize.File, error) {
+	file := excelize.NewFile()
+
+	headers := []string{"ID", "First Name", "Last Name", "Account Number", "Balance"}
+	for i, header := range headers {
+		file.SetCellValue("Sheet1", fmt.Sprintf("%s%d", string(rune(65+i)), 1), header)
+	}
+
+	for i, row := range accounts {
+		file.SetCellValue("Sheet1", fmt.Sprintf("A%d", i+2), row.ID)
+		file.SetCellValue("Sheet1", fmt.Sprintf("B%d", i+2), row.FirstName)
+		file.SetCellValue("Sheet1", fmt.Sprintf("C%d", i+2), row.LastName)
+		file.SetCellValue("Sheet1", fmt.Sprintf("D%d", i+2), row.AccountNumber)
+		file.SetCellValue("Sheet1", fmt.Sprintf("E%d", i+2), row.Balance)
+	}
+
+	err := file.SaveAs("accounts.xlsx")
+
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	return file, nil
 }

@@ -71,6 +71,21 @@ func (s *APIServer) handleGetAccounts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if r.URL.Query().Get("format") == "xlsx" {
+		file, err := WriteAccountsToExcel(accounts)
+		if err != nil {
+			s.errorResponse(w, http.StatusExpectationFailed, err.Error())
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/octet-stream")
+		w.Header().Set("Content-Disposition", "attachment; filename="+"accounts.xlsx")
+		w.Header().Set("Content-Transfer-Encoding", "binary")
+		w.Header().Set("Expires", "0")
+		file.Write(w)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(accounts)
 	if err != nil {
