@@ -106,6 +106,5 @@ func initializeRoutes(s *APIServer) *http.ServeMux {
 	mux.HandleFunc("POST /api/accounts", s.handleCreateAccounts)
 	mux.HandleFunc("PUT /api/accounts/{id}", s.handleUpdateAccount)
 	mux.HandleFunc("DELETE /api/accounts/{id}", s.handleDeleteAccounts)
-	mux.HandleFunc("GET /api/accounts/xlsx", s.handleExcelDownload)
 	return mux
 }
