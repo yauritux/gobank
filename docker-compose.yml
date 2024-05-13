@@ -2,7 +2,7 @@ services:
   db:
     image: postgres
     container_name: local_postgres
-    shm_size: 128mb
+    # shm_size: 128mb
     ports:
       - "5432:5432"
     environment:
@@ -26,6 +26,7 @@ services:
       - gobank
 
   app:
+    container_name: gobank
     build:
       context: .
     ports:

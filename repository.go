@@ -12,7 +12,7 @@ type PostgresRepository struct {
 }
 
 func NewPostgres() (*PostgresRepository, error) {
-	connStr := "user=gobank dbname=gobank password=tux123 sslmode=disable"
+	connStr := "user=gobank dbname=gobank host=local_postgres password=tux123 sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 
 	if err != nil {
