@@ -50,6 +50,10 @@ After your service is live, you can test:
 - `https://<YOUR_SERVICE_HOST>/api/health`
 - `https://<YOUR_SERVICE_HOST>/api/accounts`
 
+Example endpoints:
+- `GET https://gobank-service.onrender.com/api/health`
+- `GET https://gobank-service.onrender.com/api/accounts`
+
 ### 1) Deploy from Render Dashboard (GitHub-connected, simplest)
 
 This approach lets Render build and deploy directly from your GitHub repository.
