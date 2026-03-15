@@ -3,7 +3,6 @@ services:
     name: gobank-service
     env: docker
     dockerfilePath: ./Dockerfile
-    port: 8080
     healthCheckPath: /api/health
     envVars:
       - key: APP_CONTAINER_PORT
@@ -36,5 +35,5 @@ databases:
   - name: gobank-postgres
     databaseName: gobank
     user: gobankuser
-    plan: starter  # Use 'standard-0' or higher for production
+    plan: Basic-1gb  # Use 'standard-0' or higher for production
     ipAllowList: []  # Restrict to private services only (recommended)
