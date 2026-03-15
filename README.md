@@ -19,6 +19,7 @@ curl -X GET -H 'Accept: application/json' localhost:8080/api/accounts
 3. Healthcheck endpoint
 ```
 curl -X GET localhost:8080/api/health
+```
 
 ## Prerequisites (Render account + billing)
 
