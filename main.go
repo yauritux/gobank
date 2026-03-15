@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 type OptFunc func(*Opts)
@@ -93,7 +95,31 @@ func main() {
 	accountService := NewService(db)
 	accountsHandler := NewAPIServer(accountService)
 
-	err = http.ListenAndServe(":8080", initializeRoutes(accountsHandler))
+	mux := initializeRoutes(accountsHandler)
+
+	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		ts := time.Now().UTC().Format(time.RFC3339)
+
+		if err := db.db.Ping(); err != nil {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			_ = json.NewEncoder(w).Encode(map[string]any{
+				"status": "error",
+				"timestamp": ts,
+				"error": err.Error(),
+			})
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		_ = json.NewEncoder(w).Encode(map[string]any{
+			"status": "ok",
+			"timestamp": ts,
+		})
+	})
+
+	err = http.ListenAndServe(":8080", mux)
 	if err != nil {
 		panic(err)
 	}
