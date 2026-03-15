@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 
 	_ "github.com/lib/pq"
 )
@@ -13,7 +14,8 @@ type PostgresRepository struct {
 }
 
 func NewPostgres() (*PostgresRepository, error) {
-	connStr := "user=gobank dbname=gobank host=local_postgres password=tux123 sslmode=disable"
+	connStr := fmt.Sprintf("user=%s dbname=%s host=%s password=%s sslmode=disable",
+		os.Getenv("PG_USER"), os.Getenv("PG_DB"), os.Getenv("PG_HOST"), os.Getenv("PG_PASSWORD"))
 	db, err := sql.Open("postgres", connStr)
 
 	if err != nil {
