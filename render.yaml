@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: gobank-service
+    env: docker
+    dockerfilePath: ./Dockerfile
+    port: 8080
+    healthCheckPath: /api/health
+    envVars:
+      - key: APP_CONTAINER_PORT
+        value: "8080"
+      - key: PG_HOST
+        fromDatabase:
+          name: gobank-postgres
+          property: host
+      - key: PG_DB
+        fromDatabase:
+          name: gobank-postgres
+          property: database
+      - key: PG_USER
+        fromDatabase:
+          name: gobank-postgres
+          property: user
+      - key: PG_PASSWORD
+        fromDatabase:
+          name: gobank-postgres
+          property: password
+      - key: PG_CONTAINER_PORT
+        fromDatabase:
+          name: gobank-postgres
+          property: port
+      - key: PG_SSL_MODE
+        value: "require"
+    autoDeploy: true  # Auto-deploy on git push (optional)
+
+databases:
+  - name: gobank-postgres
+    databaseName: gobank
+    user: gobankuser
+    plan: starter  # Use 'standard-0' or higher for production
+    ipAllowList: []  # Restrict to private services only (recommended)
