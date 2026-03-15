@@ -14,8 +14,9 @@ type PostgresRepository struct {
 }
 
 func NewPostgres() (*PostgresRepository, error) {
-	connStr := fmt.Sprintf("user=%s dbname=%s host=%s password=%s sslmode=disable",
-		os.Getenv("PG_USER"), os.Getenv("PG_DB"), os.Getenv("PG_HOST"), os.Getenv("PG_PASSWORD"))
+	connStr := fmt.Sprintf("user=%s dbname=%s host=%s port=%s password=%s sslmode=%s",
+		os.Getenv("PG_USER"), os.Getenv("PG_DB"), os.Getenv("PG_HOST"), 
+		os.Getenv("PG_CONTAINER_PORT"), os.Getenv("PG_PASSWORD"), os.Getenv("PG_SSL_MODE"))
 	db, err := sql.Open("postgres", connStr)
 
 	if err != nil {

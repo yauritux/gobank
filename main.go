@@ -65,9 +65,9 @@ func (s *Server) SetMaxConn(n int) {
 }
 
 func main() {
-	fmt.Println("Starting Accounts service at port 8080...")
+	fmt.Printf("Starting Accounts service at port %s...\n", os.Getenv("APP_CONTAINER_PORT"))
 
-	tls, tlsEnabled := os.LookupEnv("TLS")
+	tls, tlsEnabled := os.LookupEnv("APP_TLS")
 
 	s := NewServer()
 
@@ -119,7 +119,7 @@ func main() {
 		})
 	})
 
-	err = http.ListenAndServe(":8080", mux)
+	err = http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("APP_CONTAINER_PORT")), mux)
 	if err != nil {
 		panic(err)
 	}

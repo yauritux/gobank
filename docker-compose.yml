@@ -4,7 +4,7 @@ services:
     container_name: local_postgres
     shm_size: 128mb
     ports:
-      - "5432:${PG_PORT}"
+      - "${PG_HOST_PORT}:${PG_CONTAINER_PORT}"
     environment:
       - POSTGRES_PASSWORD=${PG_PASSWORD}
       - POSTGRES_USER=${PG_USER}
@@ -16,7 +16,7 @@ services:
     networks:
       - gobank
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${PG_USER} -d ${PG_DB}"]    
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER} -d ${PG_DB} -p ${PG_CONTAINER_PORT}"]
       interval: 10s
       timeout: 10s
       retries: 5
@@ -38,13 +38,16 @@ services:
     depends_on:
       - db
     ports:
-      - "8080:8080"
+      - "${APP_HOST_PORT}:${APP_CONTAINER_PORT}"
     environment:
       - PG_HOST=${PG_HOST}
       - PG_DB=${PG_DB}
       - PG_USER=${PG_USER}
       - PG_PASSWORD=${PG_PASSWORD}
-      - PG_PORT=${PG_PORT}
+      - PG_CONTAINER_PORT=${PG_CONTAINER_PORT}
+      - APP_CONTAINER_PORT=${APP_CONTAINER_PORT}
+      - APP_HOST_PORT=${APP_HOST_PORT}
+      - PG_SSL_MODE=${PG_SSL_MODE}
     networks:
       - gobank
     restart: on-failure
