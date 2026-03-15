@@ -158,6 +158,14 @@ One common approach from your local machine:
 If SSL is required and not already included in the URL, add:
 - `?sslmode=require`
 
+## Render References
+
+- [Render Pricing Plans](https://render.com/pricing)
+- [Deploying on Render](https://render.com/docs/deploys)
+- [Render Web Services](https://render.com/docs/web-services)
+- [Render Blueprints](https://render.com/docs/infrastructure-as-code)
+- [Render CLI](https://render.com/docs/cli)
+
 ## Notes / Troubleshooting
 
 - Healthcheck endpoint:
